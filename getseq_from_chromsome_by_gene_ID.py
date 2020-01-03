@@ -27,8 +27,7 @@ with open(genome,'r') as fa:
             genome_dic[chr_id] = []
         else:
             genome_dic[chr_id].append(line)
-    for key,value in genome_dic.items():
-        genome_dic[key]=''.join(value)
+genome_dic={key:''.join(value) for key,value in genome_dic.items()}
 
 #定义函数，Reverse Complement，对负链上的基因反向互补
 def rev_comp(seq):
