@@ -1,28 +1,31 @@
 #!/usr/bin/python
+#History:
+#	2019-1-6 V2 Gossie
+
 import re
 
-# fragment file，txt 文件，三列：染色体、起始位置、终止位置；有表头
-ff="At_Dt_sweeps.txt"
+# fragment file，txt 文件，三列：染色体、起始位置、终止位置；无表头
+ff="ldblocks.txt"
 # 注释文件
-gff="/home/liuqibao/workspace/research/database/genome/NAU.gff3"
-# 基因上游
-up=2000
-# 基因下游
-down=2000
+gff="/home/liuqb/data/genome/Cotton/HAU1.0/HAU.gene.gff3"
 
-with open(ff,'r') as f1:
-    for line in f1:
-        chromosome = line.split()[0]
-        start = line.split()[1]
-        end = line.split()[2]
-        with open(gff,'r') as f2:
-            for ll in f2:
-                ll_list = ll.split()
-                m=re.search(r'(Gh\w+\d+);',ll_list[8])
-                if chromosome == ll_list[0] and ll_list[2]=='gene': 
-                    if int(ll_list[3])-up >= int(start) and int(ll_list[4])+down <= int(end):
-                        print("%s\t%s\t%s\t%s\t%s\t%s\t内" %(chromosome,start,end,m.group(1),ll_list[3],ll_list[4]))
-                    elif int(ll_list[3])-up < int(start) < int(ll_list[4])+down:
-                        print("%s\t%s\t%s\t%s\t%s\t%s\t头" %(chromosome,start,end,m.group(1),ll_list[3],ll_list[4]))
-                    elif int(ll_list[3])-up < int(end) < int(ll_list[4])+down:
-                        print("%s\t%s\t%s\t%s\t%s\t%s\t尾" %(chromosome,start,end,m.group(1),ll_list[3],ll_list[4]))
+#构建注释文件词典
+gff_dic={}
+with open (gff,'r') as gf:
+    for line in gf:
+        line_list=line.strip().split()
+        if not line.startswith("#") and line_list[2]=='gene':
+            gff_dic.setdefault(line_list[0],[]).append(line_list)
+
+with open(ff,'r') as f:
+    for line in f:
+        line_list=line.strip().split()
+        chromosome = line_list[0]
+        start = line_list[1]
+        end = line_list[2]
+        for value in gff_dic[chromosome]:
+            if int(value[4])<int(start) or int(value[3])>int(end):
+                continue
+            else:
+                m=re.search(r'ID=(.*);',value[8])
+                print("%s\t%s\t%s\t%s\t%s\t%s\t" %(chromosome,start,end,m.group(1),value[3],value[4]))
