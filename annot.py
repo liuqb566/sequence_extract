@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
-gene="/home/liuqibao/workspace/考博文件/lqb考博报名/xinong西农/can_gene.txt"
+#注释文件 
+anno='/home/liuqb/data/genome/Cotton/HAU1.1/HAU_annotation_v1.1.txt'
 
-with open(gene) as fd:
+gene="ld_gene.id"
+
+with open(gene,'r') as fd:
     for query in fd:
-        with open('/home/liuqibao/workspace/research/database/genome/NAU_annotation.txt') as fe:
+        with open(anno,'r') as fe:
             for line in fe:
-                if query.strip() == line.split()[0]:
-                    print(line)
+                if query.strip() in line.split()[0]:
+                    print(query.strip(),line,sep='\t')
+                    break
             
